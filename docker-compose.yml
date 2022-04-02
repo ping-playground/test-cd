@@ -1,0 +1,4 @@
+services:
+  test-program:
+    image: ghcr.io/ping-playground/test-cicd:${TEST_CICD_IMAGE_VERSION}
+    #restart: unless-stopped

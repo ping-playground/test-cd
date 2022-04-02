@@ -1,0 +1,27 @@
+name: prod-cd
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Deploy with the triggered versions
+        uses: appleboy/ssh-action@master
+        env:
+          IMG_PULL_USER: ${{ github.actor }}
+          IMG_PULL_PASS: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          host: ${{ secrets.PROD_VM_HOST }}
+          username: ${{ secrets.PROD_VM_USERNAME }}
+          key: ${{ secrets.PROD_VM_PRIVATE_KEY }}
+          envs: IMG_PULL_USER, IMG_PULL_PASS
+          script: |
+            echo $IMG_PULL_PASS | docker login ghcr.io -u $IMG_PULL_USER --password-stdin
+            if [ ! "$(ssh-keygen -F github.com)" ]; then ssh-keyscan github.com >> ~/.ssh/known_hosts 2>/dev/null; fi
+            [ ! -d test-cd ] && git clone git@test-cd:ping-playground/test-cd.git
+            cd test-cd && git pull
+            export TEST_CICD_IMAGE_VERSION=$(cat ./versions-to-deploy/test-cicd.txt)
+            docker-compose pull
+            docker-compose up -d
