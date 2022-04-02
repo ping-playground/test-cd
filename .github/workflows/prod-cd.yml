@@ -1,4 +1,5 @@
 name: prod-cd
+concurrency: prod-cd
 on:
   push:
     branches:
