@@ -26,6 +26,6 @@ jobs:
             export TEST_CICD_IMAGE_VERSION=$(cat ./versions-to-deploy/test-cicd.txt)
             TMP_ENV_NAME=tmp-env-$(date +%s)
             env > $TMP_ENV_NAME
-            docker-compose --env-file "$TMP_ENV_NAME" pull
-            docker-compose --env-file "$TMP_ENV_NAME" up -d
+            docker-compose --env-file "$TMP_ENV_NAME" pull && docker-compose --env-file "$TMP_ENV_NAME" up -d
             rm $TMP_ENV_NAME
+            docker logout ghcr.io 
