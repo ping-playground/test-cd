@@ -23,5 +23,8 @@ jobs:
             [ ! -d test-cd ] && git clone git@test-cd:ping-playground/test-cd.git
             cd test-cd && git pull
             export TEST_CICD_IMAGE_VERSION=$(cat ./versions-to-deploy/test-cicd.txt)
-            docker-compose pull
-            docker-compose up -d
+            TMP_ENV_NAME=tmp-env-$(date +%s)
+            env > $TMP_ENV_NAME
+            docker-compose --env-file "$TMP_ENV_NAME" pull
+            docker-compose --env-file "$TMP_ENV_NAME" up -d
+            rm $TMP_ENV_NAME
